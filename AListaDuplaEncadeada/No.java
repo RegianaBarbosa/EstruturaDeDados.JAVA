@@ -6,8 +6,10 @@ public class No<T extends Comparable<T>> {
     private No proximo;
     private No anterior;
 
-    public No(T valor) {
-        this.elemento = valor;
+    public No(){}
+
+    public No(T elemento) {
+        this.elemento = elemento;
         proximo = null;
     }
 
