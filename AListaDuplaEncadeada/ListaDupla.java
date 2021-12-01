@@ -9,18 +9,16 @@ public class ListaDupla < T extends Comparable<T>>{
     No<T> ultimo;
     int qtdElementos;
 
-    public ListaDupla(){
-
+    public ListaDupla(){//Criar lista vazia
+        this.primeiro = null;
+        this.ultimo = primeiro;
+        this.qtdElementos = 0;
     }
 
-    public ListaDupla(No<T>primeiro, No<T> ultimo){
-        this.primeiro = primeiro;
-        this.ultimo = ultimo;
-    }
 
     public void inserirComeco(T elemento){
         No<T> novoNo = new No<T>(elemento);
-        if (this.primeiro == null || this.qtdElementos == 0) {
+        if (this.listaVazia()) {
             this.primeiro = novoNo;
             this.ultimo = novoNo;
             this.qtdElementos++;
@@ -32,16 +30,17 @@ public class ListaDupla < T extends Comparable<T>>{
     }
 
     public void inserirFinal(T elemento){
-        if (this.primeiro == null || this.qtdElementos == 0) {
-            inserirComeco(elemento);
-        }else{
-            No<T> novoNo = new No<T>(elemento);
-            No aux = primeiro;
+        No<T> novoNo = new No<T>(elemento);
+          if(this.listaVazia()) {
+                inserirComeco(elemento);
+          }else{
+            No<T> aux = primeiro;
             while( aux.getProximo() != null){ aux = aux.getProximo();}
             novoNo.setAnterior(aux);
             aux.setProximo(novoNo);
             this.qtdElementos++;
         }
+
     }
 
     public void inserirOrdenado(T  elemento) {
@@ -49,14 +48,18 @@ public class ListaDupla < T extends Comparable<T>>{
         No<T> aux = primeiro;
         No<T> aux2 = null;
 
-        if (this.primeiro == null || this.qtdElementos == 0) {
-            inserirComeco(elemento);
+        if (this.listaVazia()) {
+            this.primeiro = novoNo;
         }else{
-            while((aux.getProximo() != null) && (aux.getElemento().compareTo(novoNo.getElemento() )== -1))
-            {aux = aux.getProximo();}
+            while(aux.getProximo() != null){
+                if(aux.getElemento().compareTo(novoNo.getElemento())==-1){
+                    aux2 = aux;
+                    aux = aux.getProximo();
+                }
+            }
 
-            if(aux == this.primeiro) {
-                if(this.primeiro.getElemento().compareTo( novoNo.getElemento() ) == -1 ) {
+            if(aux2 == this.primeiro) {
+                if(this.primeiro.getElemento()!=novoNo.getElemento()) {
                     this.primeiro.setProximo(novoNo);
                     novoNo.setAnterior(this.primeiro);
                 }else {
@@ -65,14 +68,14 @@ public class ListaDupla < T extends Comparable<T>>{
                     this.primeiro = novoNo;
                 }
             }else {
-                if(aux.getProximo() == null) {
-                    novoNo.setAnterior(aux);
-                    aux.setProximo(novoNo);
+                if(aux2.getProximo() == null) {
+                    novoNo.setAnterior(aux2);
+                    aux2.setProximo(novoNo);
                 }else {
-                    novoNo.setProximo(aux);
-                    novoNo.setAnterior(aux.getAnterior());
-                    aux.getAnterior().setProximo(novoNo);
-                    aux.setAnterior(novoNo);
+                    novoNo.setProximo(aux2);
+                    novoNo.setAnterior(aux2.getAnterior());
+                    aux2.getAnterior().setProximo(novoNo);
+                    aux2.setAnterior(novoNo);
                 }
             }
         }
@@ -89,91 +92,57 @@ public class ListaDupla < T extends Comparable<T>>{
     }
 
     public void removerFinal() {
-        if (this.primeiro == null || this.qtdElementos == 0) {
-            System.out.println("Lista vazia");
-        } else {
-            No aux = primeiro;
-            while (aux.getProximo() != null) {
-                aux = aux.getProximo();
+        if (this.ultimo != null) {
+            No<T> aux = ultimo;
+            this.ultimo = this.ultimo.getAnterior();
+            if(this.ultimo!=null){
+                this.ultimo.setProximo(null);
+            } else{
+                primeiro = new No<>(null);
             }
-            aux.getAnterior().setProximo(null);
-            aux.setAnterior(null);
             this.qtdElementos--;
         }
     }
 
-    public void removerElemento(T elemento) {
-        No<T> aux = primeiro; //aux serve para percorrer a lista
-        No<T> no = null; //no que será removido
-
-        while((aux != null) && (aux.getElemento().compareTo(elemento) != 0))
-        {   no = aux;
-            aux = aux.getProximo(); }
-
-        if(no == null) {
-            System.out.println("Elemento não existe na lista");
-        } else if(no == this.primeiro) {
+    public void removerElemento(int posicao) {
+        if(posicao == 0){
             removerComeco();
-        }else if(no == this.ultimo){
+        } else if(posicao == this.qtdElementos - 1 ){
             removerFinal();
-        } else{ //remover elemento do meio
-            no.getAnterior().setProximo(no.getProximo());
-            no.getProximo().setAnterior(no.getAnterior());
-            no.setAnterior(null);
-            no.setProximo(null);
+        } else{
+            No<T> noRemover = primeiro;
+
+            for(int i=0; i<posicao; i++){
+                noRemover = noRemover.getProximo();
+            }
+            if(noRemover.getAnterior() != null && noRemover.getProximo() != null){
+                noRemover.getAnterior().setProximo(noRemover.getProximo());
+                noRemover.getProximo().setAnterior(noRemover.getAnterior());
+            }
             this.qtdElementos--;
         }
-
     }
 
     public No<T> buscar(T elemento) {
-      /*
-        if(no_atual== null)
-            no_atual = primeiro;
-
-        while((no_atual != null) && (no_atual.obterValor().compareTo( elemento )) != 0  )
-        {
-            if (no_atual.obterValor().compareTo(elemento)==-1){
-                no_atual = no_atual.obterProximo();
-            }
-            else
-                no_atual=no_atual.obterAnterior();
-
-
+        if(this.listaVazia() || elemento == null) return null;
+        No<T> auxBusca = this.primeiro;
+        while(auxBusca.getProximo() != null){
+            if(auxBusca.getProximo().getElemento().equals(elemento)) return (No<T>) auxBusca.getProximo().getElemento();
+            auxBusca = auxBusca.getProximo();
         }
-        return no_atual;*/
-        return primeiro;
+        return null;
     }
 
-    public String buscarCount(T elemento) {
-        /*
-        int count = 0;
-
-        if(no_atual== null)
-            no_atual = primeiro;
-
-        while((no_atual != null) && (no_atual.obterValor().compareTo( elemento )) != 0  )
-        {
-            count++;
-            if (no_atual.obterValor().compareTo(elemento)==-1){
-                no_atual = no_atual.obterProximo();
-            }
-            else
-                no_atual=no_atual.obterAnterior();
-        }
-
-
-        return "Achou "+no_atual.obterValor()+" com "+count + " passos";
-
-         */
-        return "achou";
+    public boolean listaVazia(){
+        return (this.primeiro == null && this.ultimo == null);
     }
 
-    public void lerArquivo() {
+    public String [] lerArquivo() {
+        String dados = "";
         try {
-            FileInputStream arquivo = new FileInputStream("C:\\Users\\Regiana\\OneDrive\\Documentos\\IFMA - S.I\\Disciplinas 2021.2\\Algoritmos e Estrutura de Dados II\\atividades\\dadosLista.txt"); //referência para o arquivo que deseja ler.
-            InputStreamReader input = new InputStreamReader(arquivo); //FileReader - para iniciar um leitor de arquivo
-            BufferedReader br = new BufferedReader(input); //BufferedReader - para poder ler linha por linha do arquivo e jogar em uma lista.
+            FileInputStream arquivo = new FileInputStream("C:\\Users\\Regiana\\IdeaProjects\\Luis_GitHub\\Entradas\\dadosLista.txt"); //referência para o arquivo que deseja ler.
+            InputStreamReader input = new InputStreamReader(arquivo);
+            BufferedReader br = new BufferedReader(input);
 
             String linha;
 
@@ -181,28 +150,29 @@ public class ListaDupla < T extends Comparable<T>>{
                 linha = br.readLine();
                 if (linha != null) {
                     String[] palavra = linha.split(";");
-                    System.out.println("Nova linha-------");
                     for (int i = 0; i < palavra.length; i++) {
                         inserirFinal((T) palavra[i]);
-                        System.out.println("Palavra lida = " + palavra[i]);
+                        dados.concat(palavra[i]);
                     }
                 }
             } while (linha != null);
+
         } catch (Exception e) {
             System.out.println("Erro ao ler arquivo");
         }
+        return dados.split(" ");
     }
 
     public String toString() {
-        String s = "";
-        No<T> auxiliar = primeiro;
+        String infoLista;
+        No<T> atual = primeiro;
 
-        while(auxiliar != null)
-        {
-            s+= auxiliar.getElemento().toString() + " ; ";
-            auxiliar = auxiliar.getProximo();
+        infoLista="Tamanho: "+this.qtdElementos+"\n";
+        while(atual != null){
+            infoLista+= atual.getElemento()+"; ";
+            atual = atual.getProximo();
         }
-        return s;
+        return infoLista;
     }
 
 }

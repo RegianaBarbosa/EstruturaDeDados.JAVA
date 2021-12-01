@@ -2,27 +2,16 @@ package AListaDuplaEncadeada;
 
 public class TesteListaDupla {
     public static void main(String[] args) {
+        ListaDupla<Integer> l = new ListaDupla<Integer>();
 
-        ListaDupla<Integer> lista = new ListaDupla<Integer>();
-        lista.lerArquivo();
-
-        System.out.println(lista);
+        l.lerArquivo(); // insere os dados: 1 2 3 4 5
+        System.out.println(l); //imprime a lista
+        l.removerComeco(); // remove o elemento 1 | lista atual: 2 3 4 5
+        System.out.println(l); //imprime a lista
+        l.removerElemento(2);  // remove o elemento na posição 3 | lista atual: 2 3 4 5
+        System.out.println(l); //imprime a lista
+        l.removerFinal(); // 2 3
+        System.out.println(l); //imprime a lista
     }
 
 }
- /*
-    public void inserirComeco(T elemento){}
-
-    public void inserirFinal(T elemento){}
-
-    public void inserirOrdenado(T  elemento) {}
-
-    public void removerComeco(){}
-
-    public void removerFinal() {}
-
-    public No<T> buscar(T elemento) {}
-
-    public String buscarCount(T elemento) {}
-
-    public void lerArquivo() {}*/
